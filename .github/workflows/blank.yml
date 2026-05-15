@@ -41,7 +41,7 @@ jobs:
         mkdir -p ~/android/a51one
         cd ~/android/a51one
         # Inicializa o repositório principal do Android 15 puro (AOSP)
-        repo init -u https://googlesource.com -b android-15.0.0_r1 --depth=1
+        repo init -u https://android.googlesource.com/platform/manifest -b android-15.0.0_r1 --depth=1
 
     - name: Baixando as Configurações de Hardware do Galaxy A51
       run: |
