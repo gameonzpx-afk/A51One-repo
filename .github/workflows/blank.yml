@@ -53,6 +53,9 @@ jobs:
         cat <<EOF > .repo/local_manifests/a51.xml
         <?xml version="1.0" encoding="UTF-8"?>
         <manifest>
+        <!-- Define o servidor do GitHub para o sistema saber onde buscar -->
+          <remote name="github" fetch="https://github.com" />
+          
           <!-- Árvore do dispositivo (Device Tree) do Galaxy A51 -->
           <project name="Exynos9611-devs/android_device_samsung_a51" path="device/samsung/a51" remote="github" revision="android-15" />
           <!-- Kernel e drivers do processador -->
