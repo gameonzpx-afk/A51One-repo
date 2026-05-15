@@ -1,0 +1,70 @@
+name: Fabricador do A51One OS
+
+on:
+  workflow_dispatch: # Permite que você clique no botão cinza para iniciar manualmente
+
+jobs:
+  construir_sistema:
+    runs-on: ubuntu-22.04 # Abre um servidor Linux potente e gratuito na nuvem
+    
+    steps:
+    - name: Baixando os arquivos do seu GitHub
+      uses: actions/checkout@v4
+
+    - name: Limpando espaço na nuvem (Para caber o Android 15)
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+    - name: Instalando ferramentas de programação no Linux
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
+
+    - name: Configurando o Git da Nuvem
+      run: |
+        git config --global user.name "Criador A51One"
+        git config --global user.email "a51one@projeto.local"
+
+    - name: Baixando a Ferramenta Repo do Google Oficial
+      run: |
+        mkdir -p ~/bin
+        # Usa o link oficial que você enviou para baixar o gerenciador
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod a+x ~/bin/repo
+        sudo ln -sf ~/bin/repo /usr/bin/repo
+
+    - name: Inicializando o Código Fonte do Android 15
+      run: |
+        mkdir -p ~/android/a51one
+        cd ~/android/a51one
+        # Inicializa o repositório principal do Android 15 puro (AOSP)
+        repo init -u https://googlesource.com -b android-15.0.0_r1 --depth=1
+
+    - name: Baixando as Configurações de Hardware do Galaxy A51
+      run: |
+        cd ~/android/a51one
+        # Cria a pasta oculta de mapas de arquivos
+        mkdir -p .repo/local_manifests
+        
+        # Cria as instruções para buscar a árvore do processador Exynos 9611 da comunidade de desenvolvedores
+        cat <<EOF > .repo/local_manifests/a51.xml
+        <?xml version="1.0" encoding="UTF-8"?>
+        <manifest>
+          <!-- Árvore do dispositivo (Device Tree) do Galaxy A51 -->
+          <project name="Exynos9611-devs/android_device_samsung_a51" path="device/samsung/a51" remote="github" revision="android-15" />
+          <!-- Kernel e drivers do processador -->
+          <project name="Exynos9611-devs/android_kernel_samsung_exynos9611" path="kernel/samsung/exynos9611" remote="github" revision="android-15" />
+        </manifest>
+        EOF
+
+    - name: Baixando os Gigabytes do Sistema (Repo Sync)
+      run: |
+        cd ~/android/a51one
+        # Executa o download pesado em paralelo na nuvem
+        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+
+    - name: Mensagem de Conclusão do Criador de 11 Anos
+      run: echo "O Android 15 com o link oficial do Google e os arquivos do A51 foram baixados e mesclados! O A51One está pronto!"
